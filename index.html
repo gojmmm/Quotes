@@ -160,6 +160,10 @@
     .cv-checkup-body { font-size: 9px; line-height: 1.5; }
     .cv-checkup-footer { font-size: 8px; }
     .cv-footer { font-size: 9px; }
+
+    /* T&C mobile */
+    .tc-page { padding: 16px 12px !important; }
+    .tc-page div[style*="font-size:9px"] { font-size: 8.5px !important; }
   }
 
     @media (max-width: 480px) {
@@ -190,8 +194,18 @@
     .cv-checkup-body { font-size: 9px; line-height: 1.4; }
     .action-bar { flex-direction: column; }
     .action-bar .btn { width: 100%; }
+
+    /* T&C extra compact */
+    .tc-page { padding: 10px 8px !important; }
   }
 
+
+
+  /* Print mode classes - applied via JS before printing */
+  body.print-customer #tab-internal { display: none !important; }
+  body.print-customer #tab-customer { display: block !important; }
+  body.print-internal #tab-customer { display: none !important; }
+  body.print-internal #tab-internal { display: block !important; }
 
   /* Print styles */
   @media print {
@@ -201,6 +215,10 @@
     .cv-body * { max-width: 100%; overflow-wrap: break-word; }
     .card { box-shadow: none; border: 1px solid #ddd; }
     .tab-content { padding: 0; overflow: hidden; }
+    body.print-customer #tab-internal { display: none !important; }
+    body.print-customer #tab-customer { display: block !important; padding: 0 !important; }
+    body.print-internal #tab-customer { display: none !important; }
+    body.print-internal #tab-internal { display: block !important; padding: 0 !important; }
     #tab-internal table { display: none; }
     
     /* Compact customer view for print */
@@ -242,7 +260,20 @@
     .cv-checkup-body { font-size: 9px; line-height: 1.4; }
     .cv-checkup-footer { font-size: 8px; margin-top: 3px; padding-top: 3px; }
     .cv-footer { padding-top: 6px; font-size: 9px; line-height: 1.4; overflow: hidden; }
+    /* T&C Page 2 */
+    body.print-customer .tc-page { display: block !important; page-break-before: always; }
+    body.print-customer .tc-page {
+      box-shadow: none !important; border-radius: 0 !important; margin: 0 auto !important;
+      padding: 10px 20px !important; -webkit-column-break-before: always;
+      -webkit-print-color-adjust: exact; print-color-adjust: exact;
+      overflow: hidden !important; max-width: 100% !important;
+    }
+    body.print-customer .tc-page * { font-family: 'Poppins', sans-serif !important; box-sizing: border-box !important; overflow-wrap: break-word !important; word-wrap: break-word !important; }
+    body.print-customer .tc-page div { max-width: 100% !important; }
+    body.print-internal .tc-page { display: none !important; }
+
     #cv-discount-row { font-size: 10px !important; }
+    #cv-subtotal-row[style*='display:none'], #cv-discount-row[style*='display:none'] { display: none !important; height: 0 !important; padding: 0 !important; margin: 0 !important; overflow: hidden !important; }
     .deposit-note { font-size: 9px !important; margin-top: 2px !important; font-family: 'Poppins', sans-serif !important; }
   }
 
@@ -432,8 +463,8 @@
         <tbody id="cv-tbody"></tbody>
       </table>
       <div class="cv-totals"><div class="cv-totals-box">
-        <div class="cv-total-row" id="cv-subtotal-row"><span>Sub-Total</span><span id="cv-subtotal">$0</span></div>
-        <div class="cv-total-row no-print" style="align-items:center">
+        <div class="cv-total-row" id="cv-subtotal-row" style="display:none"><span>Sub-Total</span><span id="cv-subtotal">$0</span></div>
+        <div class="cv-total-row no-print" id="cv-discount-select-row" style="align-items:center">
           <span>Discount</span>
           <select id="cv-discount" onchange="updateCustomerTotals()" style="padding:4px 8px;font-size:11px;border:1px solid #ccc;border-radius:4px;margin-left:8px">
             <option value="0">No discount</option>
@@ -456,7 +487,9 @@
           <span style="font-weight:600">Deposit (50%)</span>
           <span style="font-weight:700;color:#1a1a1a" id="cv-deposit">$0</span>
         </div>
-        <div class="deposit-note" style="font-size:9px;color:#888;margin-top:4px;text-align:right">* Deposit required upon acceptance of quote</div>
+        <div class="deposit-note" style="font-size:9px;color:#888;margin-top:4px;text-align:right">* Deposit (50%) due upon acceptance of quote</div>
+        <div class="deposit-note" style="font-size:9px;color:#888;margin-top:2px;text-align:right">* Balance due within one (1) day of project completion</div>
+        <div class="deposit-note" style="font-size:9px;color:#888;margin-top:2px;text-align:right">* Installation scheduled within seven (7) days of deposit</div>
       </div></div>
       <div class="cv-checkup">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
@@ -471,10 +504,56 @@
       </div>
       <div class="action-bar no-print" style="margin-top:20px">
         <button class="btn btn-print" onclick="printView('customer')" style="font-size:14px;padding:12px 28px">🖨️ Print / Save as PDF</button>
-        <div style="font-size:10px;color:#888;margin-top:6px;text-align:center" class="no-print">iPhone: Use Safari Share button → Print → Pinch to zoom out → Share → Save PDF</div>
+        
       </div>
       <div class="cv-footer">Thank you for your business. Please contact us with any questions regarding this quote.<br><strong>NASHVILLE LIGHTING LLC</strong> &nbsp;|&nbsp; (615) 488-0020 &nbsp;|&nbsp; sales@nashvillelighting.com</div>
     </div>
+
+    <!-- T&C Page 2 (visible on screen + prints as page 2) -->
+    <div class="tc-page" style="font-family:'Poppins',sans-serif; padding: 20px 30px; max-width: 780px; margin: 24px auto 0; background: #fff; border-radius: 8px; box-shadow: 0 1px 6px rgba(0,0,0,0.1); overflow-wrap: break-word; word-wrap: break-word;">
+      <div style="text-align:center;margin-bottom:4px">
+        <div style="font-family:'Poppins',sans-serif;font-size:15px;font-weight:700;color:#1a1a1a">NASHVILLE LIGHTING LLC</div>
+        <div style="font-family:'Poppins',sans-serif;font-size:9px;color:#888;margin-bottom:8px">SERVICE TERMS AND CONDITIONS</div>
+        <hr style="border:none;border-top:1px solid #ccc;margin-bottom:7px">
+        <div style="font-family:'Poppins',sans-serif;font-size:8px;font-style:italic;color:#4a4a4a;margin-bottom:10px">By accepting a quote and paying the deposit, you agree to these terms. Contact us with any questions.</div>
+      </div>
+
+      <div style="font-family:'Poppins',sans-serif;font-size:9px;font-weight:600;color:#1a1a1a;margin-top:7px;margin-bottom:2px">1. MATERIALS AND LABOR</div>
+      <div style="font-family:'Poppins',sans-serif;font-size:8px;color:#333;text-align:justify;margin-bottom:3px;overflow-wrap:break-word">Nashville Lighting, LLC (&ldquo;the Company&rdquo;) will provide all materials and labor listed in the quote. Colors, sizes, and placement may vary slightly from samples or photos. If a material is unavailable, the Company may substitute a comparable alternative. Any change in scope requires a revised quote approved by the Customer. All work complies with applicable laws and codes.</div>
+
+      <div style="font-family:'Poppins',sans-serif;font-size:9px;font-weight:600;color:#1a1a1a;margin-top:7px;margin-bottom:2px">2. INSTALLATION SCHEDULE</div>
+      <div style="font-family:'Poppins',sans-serif;font-size:8px;color:#333;text-align:justify;margin-bottom:3px;overflow-wrap:break-word">Installation will be scheduled within seven (7) days of receiving the deposit. Timelines vary by scope and weather. The Company may reschedule due to weather, Customer delays, or other factors beyond its control.</div>
+
+      <div style="font-family:'Poppins',sans-serif;font-size:9px;font-weight:600;color:#1a1a1a;margin-top:7px;margin-bottom:2px">3. CUSTOMER RESPONSIBILITIES</div>
+      <div style="font-family:'Poppins',sans-serif;font-size:8px;color:#333;text-align:justify;margin-bottom:3px;overflow-wrap:break-word">The Customer must identify all underground hazards (utility lines, pet fences, pipes, irrigation, property lines) before work begins. Gates and fences must be secured before releasing children or pets into the work area. The Customer must provide accessible 110/120V power near planned lighting locations. The Company is not responsible for issues with existing wiring.</div>
+
+      <div style="font-family:'Poppins',sans-serif;font-size:9px;font-weight:600;color:#1a1a1a;margin-top:7px;margin-bottom:2px">4. LIMITATION OF LIABILITY</div>
+      <div style="font-family:'Poppins',sans-serif;font-size:8px;color:#333;text-align:justify;margin-bottom:3px;overflow-wrap:break-word">The Company is not liable for damage from drilling, excavating, or digging&mdash;including damage to walls, paint, drywall, landscaping, underground lines, irrigation, fencing, existing structures, or erosion from soil disturbance. Installers may drill walls or rooflines and use staples, hooks, or fasteners to secure lights and cables, using best practices to minimize impact. The Company is not liable for preexisting damage or for gates/fences left open.</div>
+
+      <div style="font-family:'Poppins',sans-serif;font-size:9px;font-weight:600;color:#1a1a1a;margin-top:7px;margin-bottom:2px">5. PAYMENT</div>
+      <div style="font-family:'Poppins',sans-serif;font-size:8px;color:#333;text-align:justify;margin-bottom:3px;overflow-wrap:break-word">A 50% deposit is due upon acceptance. The remaining balance is due within one (1) day of project completion via the credit card on file in Jobber, or an alternate method arranged in advance.</div>
+
+      <div style="font-family:'Poppins',sans-serif;font-size:9px;font-weight:600;color:#1a1a1a;margin-top:7px;margin-bottom:2px">6. WARRANTY</div>
+      <div style="font-family:'Poppins',sans-serif;font-size:8px;color:#333;text-align:justify;margin-bottom:3px;overflow-wrap:break-word">Installation workmanship is warranted for six (6) months. OEM fixtures carry a lifetime manufacturer&rsquo;s warranty. LED bulbs and wiring are warranted for six (6) months. The warranty is void if: the period has expired; fixtures or wiring were altered by unauthorized parties; damage was caused intentionally, accidentally, or by improper voltage; or damage resulted from acts of nature (storms, flooding, etc.).</div>
+
+      <div style="font-family:'Poppins',sans-serif;font-size:9px;font-weight:600;color:#1a1a1a;margin-top:7px;margin-bottom:2px">7. COMPLIMENTARY 3-MONTH CHECK-UP</div>
+      <div style="font-family:'Poppins',sans-serif;font-size:8px;color:#333;text-align:justify;margin-bottom:3px;overflow-wrap:break-word">Every landscape lighting installation includes a free check-up approximately three months after install. The visit covers:</div>
+      <div style="font-family:'Poppins',sans-serif;font-size:8px;color:#333;margin-left:10px;margin-bottom:1px">&bull;&ensp;Fixture operation and alignment &ensp;&bull;&ensp;Bulb inspection and replacement &ensp;&bull;&ensp;Transformer settings</div>
+      <div style="font-family:'Poppins',sans-serif;font-size:8px;color:#333;margin-left:10px;margin-bottom:2px">&bull;&ensp;Lens and fixture cleaning &ensp;&bull;&ensp;Wiring inspection</div>
+      <div style="font-family:'Poppins',sans-serif;font-size:8px;color:#333;text-align:justify;margin-bottom:3px;overflow-wrap:break-word">The Customer must schedule the visit within six (6) months of installation; after that the offer expires.</div>
+
+      <div style="font-family:'Poppins',sans-serif;font-size:9px;font-weight:600;color:#1a1a1a;margin-top:7px;margin-bottom:2px">8. ONGOING MAINTENANCE</div>
+      <div style="font-family:'Poppins',sans-serif;font-size:8px;color:#333;text-align:justify;margin-bottom:3px;overflow-wrap:break-word">Starting six months after installation, maintenance visits are available at $135 per visit plus materials. Visits include the same scope as the complimentary check-up. Scheduling is at the Customer&rsquo;s request.</div>
+
+      <div style="font-family:'Poppins',sans-serif;font-size:9px;font-weight:600;color:#1a1a1a;margin-top:7px;margin-bottom:2px">9. PHOTOGRAPH RELEASE</div>
+      <div style="font-family:'Poppins',sans-serif;font-size:8px;color:#333;text-align:justify;margin-bottom:3px;overflow-wrap:break-word">The Customer grants the Company permission to use project photographs in any marketing materials, including print, digital, social media, and the Company&rsquo;s website.</div>
+
+      <div style="margin-top:10px;border-top:1px solid #ccc;padding-top:6px;text-align:center">
+        <div style="font-family:'Poppins',sans-serif;font-size:7.5px;color:#888">&copy; 2026 Nashville Lighting LLC &bull; All Rights Reserved</div>
+        <div style="font-family:'Poppins',sans-serif;font-size:7.5px;color:#888">www.NashvilleLighting.com &bull; Sales@NashvilleLighting.com &bull; 615.488.0020</div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -728,38 +807,28 @@ function calculateQuote() {
 }
 
 function printView(view) {
-  // Detect mobile
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  // Add print-mode class to body FIRST (CSS takes effect immediately)
+  document.body.classList.remove('print-customer', 'print-internal');
+  document.body.classList.add(view === 'customer' ? 'print-customer' : 'print-internal');
   
+  // Also switch the visible tab
   if (view === 'customer') {
     switchTab('customer');
-    document.getElementById('tab-internal').style.display = 'none';
-    document.getElementById('tab-customer').style.display = 'block';
-    document.getElementById('tab-customer').classList.add('active');
-  } else {
-    document.getElementById('tab-customer').style.display = 'none';
-    document.getElementById('tab-internal').style.display = 'block';
-    document.getElementById('tab-internal').classList.add('active');
   }
   
-  setTimeout(() => {
-    if (isMobile) {
-      // iOS Safari: window.print() may not work
-      // Try print first, if it fails show instructions
-      try {
-        window.print();
-      } catch(e) {
-        alert('To save as PDF on iPhone:\n1. Tap the Share button (box with arrow)\n2. Select "Print"\n3. Pinch-zoom out on the preview\n4. Tap "Share" again to save as PDF');
-      }
-    } else {
+  // Force layout recalculation before printing
+  document.body.offsetHeight;
+  
+  // Use requestAnimationFrame to ensure DOM is painted before print
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
       window.print();
-    }
-    // Restore tabs after print
-    setTimeout(() => {
-      document.getElementById('tab-internal').style.display = '';
-      document.getElementById('tab-customer').style.display = '';
-    }, 1000);
-  }, 400);
+      // Clean up after print dialog closes
+      setTimeout(() => {
+        document.body.classList.remove('print-customer', 'print-internal');
+      }, 1500);
+    });
+  });
 }
 
 function clearForm() {
